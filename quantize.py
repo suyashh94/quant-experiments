@@ -3,6 +3,7 @@ from transformers import AutoTokenizer
 
 from llmcompressor.modifiers.quantization import QuantizationModifier,GPTQModifier
 from llmcompressor.transformers import SparseAutoModelForCausalLM, oneshot
+import argparse
 
 from config import MODEL_ID, DATASET_ID, DATASET_SPLIT, NUM_CALIBRATION_SAMPLES,\
     MAX_SEQUENCE_LENGTH, quantization_recipes
@@ -56,16 +57,19 @@ def applyQuantization(model, tokenizer, quantize_method):
     else:
         oneshot(model=model, recipe=recipe)
     
-    SAVE_DIR = MODEL_ID.split("/")[1] + f"-{quantize_method}"
+    SAVE_DIR = MODEL_ID.split("/")[1] + "-{quantize_method}".format(quantize_method=quantize_method)
     model.save_pretrained(SAVE_DIR)
     tokenizer.save_pretrained(SAVE_DIR)
     
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Quantize a model with a specified method.")
+    parser.add_argument("--quantize_method", type=str, help="The quantization method to use.", choices=quantization_recipes.keys(), default="W8A8")
+    args = parser.parse_args()
+
     model, tokenizer = getModelAndTokenizer(MODEL_ID)
-    quantize_method = "FP8_DYNAMIC"
-    applyQuantization(model, tokenizer, quantize_method)
+    applyQuantization(model, tokenizer, args.quantize_method)
 
 
 # # Confirm generations of the quantized model look sane.
