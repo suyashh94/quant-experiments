@@ -24,5 +24,5 @@ if __name__ == "__main__":
     for method in quantization_recipes.keys():
         print(f"Running quantization for method: {method}")
         run_quantization_script(method)
-        break
+        # break
         

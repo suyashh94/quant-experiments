@@ -3,5 +3,5 @@ lm_eval --model vllm \
   --tasks lambada_openai,hellaswag,piqa,winogrande,truthfulqa_mc1,openbookqa,gsm8k \
   --num_fewshot 5 \
   --limit 20 \
-  --batch_size 'auto' \
+  --batch_size 2 \
   --output_path 'eval-results/'
