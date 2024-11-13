@@ -1,6 +1,7 @@
 from llmcompressor.modifiers.quantization import QuantizationModifier,GPTQModifier
 
 MODEL_ID = "meta-llama/Meta-Llama-3-8B-Instruct"
+MODEL_ID = "microsoft/Phi-3.5-mini-instruct"
 # Select calibration dataset.
 DATASET_ID = "HuggingFaceH4/ultrachat_200k"
 DATASET_SPLIT = "train_sft"
