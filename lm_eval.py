@@ -30,7 +30,7 @@ def evaluate_model(model_folder):
     # Execute the command
     result = subprocess.run(command, capture_output=True, text=True)
     # return result
-    
+    error_string = "No errors occurred"
     # Check if the command was executed successfully
     if result.returncode == 0:
         print(f"Successfully evaluated model: {model_folder}")
@@ -38,12 +38,21 @@ def evaluate_model(model_folder):
     else:
         print(f"Error in evaluating model: {model_folder}")
         print(result.stderr)
+        error_string = result.stderr
+    
+    return error_string
     
 if __name__ == "__main__":
     model_folders = get_model_folders()
     for model_folder in model_folders:
         print(f"Evaluating model: {model_folder}")
-        evaluate_model(model_folder)
-        break
+        error_string = evaluate_model(model_folder)
+        # break
         # break after evaluating the first model for testing purposes
         # remove the break statement to evaluate all models
+        
+        logs_dir = 'eval-logs'
+        os.makedirs(logs_dir, exist_ok=True)
+        with open(f"{logs_dir}/{model_folder}.txt", "w") as f:
+            f.write(error_string)
+        

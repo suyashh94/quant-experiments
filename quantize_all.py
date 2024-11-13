@@ -32,9 +32,8 @@ if __name__ == "__main__":
         print(f"Running quantization for method: {method}")
         error_string = run_quantization_script(method)
         # break
-        # write a method.txt file with the error message for each quantization method  
         logs_dir = "logs"
         os.makedirs(logs_dir, exist_ok=True) 
-        with open(f"{method}.txt", "w") as f:
+        with open(f"{logs_dir}/{method}.txt", "w") as f:
             f.write(error_string)
         

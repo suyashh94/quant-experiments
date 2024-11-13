@@ -4,6 +4,7 @@ from transformers import AutoTokenizer
 from llmcompressor.modifiers.quantization import QuantizationModifier,GPTQModifier
 from llmcompressor.transformers import SparseAutoModelForCausalLM, oneshot
 import argparse
+import os
 
 from config import MODEL_ID, DATASET_ID, DATASET_SPLIT, NUM_CALIBRATION_SAMPLES,\
     MAX_SEQUENCE_LENGTH, quantization_recipes
@@ -34,7 +35,8 @@ def tokenize(sample,tokenizer):
     )
 
 def getDataset(dataset_id, dataset_split, model_tokenizer):
-    ds = load_dataset(dataset_id, dataset_split)
+    ds = load_dataset(dataset_id)
+    ds = ds[dataset_split]
     ds = ds.shuffle(seed=42).select(range(NUM_CALIBRATION_SAMPLES))
     ds = ds.map(preprocess, fn_kwargs={"tokenizer": model_tokenizer})
     ds = ds.map(tokenize, fn_kwargs={"tokenizer": model_tokenizer}, remove_columns=ds.column_names)
@@ -44,6 +46,12 @@ def getQuantizationRecipe(quantize_method):
     return quantization_recipes[quantize_method]["recipe"], quantization_recipes[quantize_method]["needs_calibration"]
 
 def applyQuantization(model, tokenizer, quantize_method):
+    
+    SAVE_DIR = MODEL_ID.split("/")[1] + "-{quantize_method}".format(quantize_method=quantize_method)
+    if os.path.exists(SAVE_DIR):
+        print(f"Model already exists at {SAVE_DIR}. Skipping quantization.")
+        return
+    
     recipe, needs_calibration = getQuantizationRecipe(quantize_method)
     if needs_calibration:
         ds = getDataset(DATASET_ID, DATASET_SPLIT, tokenizer)
@@ -57,7 +65,7 @@ def applyQuantization(model, tokenizer, quantize_method):
     else:
         oneshot(model=model, recipe=recipe)
     
-    SAVE_DIR = MODEL_ID.split("/")[1] + "-{quantize_method}".format(quantize_method=quantize_method)
+    
     model.save_pretrained(SAVE_DIR)
     tokenizer.save_pretrained(SAVE_DIR)
     
