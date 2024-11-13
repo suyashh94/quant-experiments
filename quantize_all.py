@@ -1,5 +1,6 @@
 import subprocess
 from config import quantization_recipes
+import os
 
 def run_quantization_script(quantize_method):
     # Command to activate Conda environment and run the script with the specified quantization method
@@ -15,14 +16,25 @@ def run_quantization_script(quantize_method):
     if result.returncode == 0:
         print(f"Successfully executed quantization for method: {quantize_method}")
         print(result.stdout)
+        error_string = "No errors occurred"
     else:
         print(f"Error in quantization for method: {quantize_method}")
         print(result.stderr)
+        error_string = result.stderr
+    
+    return error_string
+    
+    
 
 if __name__ == "__main__":
     # Iterate over all available quantization methods and run them one by one
     for method in quantization_recipes.keys():
         print(f"Running quantization for method: {method}")
-        run_quantization_script(method)
+        error_string = run_quantization_script(method)
         # break
+        # write a method.txt file with the error message for each quantization method  
+        logs_dir = "logs"
+        os.makedirs(logs_dir, exist_ok=True) 
+        with open(f"{method}.txt", "w") as f:
+            f.write(error_string)
         
