@@ -63,13 +63,24 @@ def applyQuantization(model, tokenizer, quantize_method):
             num_calibration_samples=NUM_CALIBRATION_SAMPLES,
         )
     else:
-        oneshot(model=model, recipe=recipe)
-    
-    
-    model.save_pretrained(SAVE_DIR)
+        if recipe != "Custom":
+            oneshot(model=model, recipe=recipe)
+        else:
+            if quantize_method == "AWQ-W4A16":
+                from awq import AutoAWQForCausalLM
+                quant_config = { "zero_point": True, "q_group_size": 128, "w_bit": 4, "version": "GEMM" }
+                model = AutoAWQForCausalLM.from_pretrained(
+                MODEL_ID, low_cpu_mem_usage=True, use_cache=False
+            )
+                tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, trust_remote_code=True)
+                model.quantize(tokenizer=tokenizer, quant_config=quant_config)
+                
+    if quantize_method != "AWQ-W4A16":
+        model.save_pretrained(SAVE_DIR)
+    else:
+        model.save_quantized(SAVE_DIR)
     tokenizer.save_pretrained(SAVE_DIR)
     
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Quantize a model with a specified method.")

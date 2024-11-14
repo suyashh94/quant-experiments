@@ -44,5 +44,9 @@ quantization_recipes = {
         "GPTQ-W8A8" : {
             "recipe" : GPTQModifier(targets="Linear", scheme="W8A8", ignore=["lm_head"]),
             "needs_calibration" : True
-        },     
+        },
+        "AWQ-W4A16":{
+            "recipe" : "Custom",
+            "needs_calibration" : False
+        }     
     }
