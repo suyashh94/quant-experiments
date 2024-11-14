@@ -7,3 +7,4 @@ __pycache__/
 # Specific model directories
 Meta-Llama-3-8B-Instruct-W8A8/
 Phi-3.5-mini-instruct-W8A16/
+Phi-3.5-mini-instruct-*/
