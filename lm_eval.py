@@ -16,7 +16,7 @@ def evaluate_model(model_folder):
   --model_args pretrained='./{model_folder}',add_bos_token=true \
   --tasks lambada_openai,hellaswag,piqa,winogrande,truthfulqa_mc1,openbookqa,gsm8k \
   --num_fewshot 5 \
-  --limit 20 \
+  --limit 500 \
   --batch_size 2 \
   --output_path 'eval-results/{quantize_method}'
   '''
